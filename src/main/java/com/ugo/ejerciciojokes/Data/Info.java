@@ -1,3 +1,4 @@
+//Autor Ugo Gianio De Simón
 package com.ugo.ejerciciojokes.Data;
 
 public class Info{

@@ -1,72 +1,50 @@
 package com.ugo.ejerciciojokes.Data;
 
-import java.util.List;
-
 public class Joke{
 	
 	
     public String category;
     public String type;
     public String joke;
-    public Flags flags;
-    public int id;
-    public boolean safe;
-    public String setup;
     public String delivery;
-    public String language;
-    
-    
-	public Joke(String category, String type, String joke, Flags flags, int id, boolean safe, String setup,
-			String delivery, String language) {
+    public String setup;
+    public Flags flags;
+	public String lang;
+
+
+	public Joke(String category, String type, String texto1, String texto2, Flags flags,  String lang) {
 		super();
+		
 		this.category = category;
 		this.type = type;
-		this.joke = joke;
+		this.delivery = texto1;
+		this.setup = texto2;
 		this.flags = flags;
-		this.id = id;
-		this.safe = safe;
-		this.setup = setup;
-		this.delivery = delivery;
-		this.language = language;
+		this.lang = lang;
 	}
 	
-	public Joke(String category, String type, Flags flags, int id, boolean safe, String setup,
-			String delivery, String language) {
+	public Joke(String category, String type, String texto1, Flags flags,  String lang) {
 		super();
+		
 		this.category = category;
 		this.type = type;
+		this.joke = texto1;
 		this.flags = flags;
-		this.id = id;
-		this.safe = safe;
-		this.setup = setup;
-		this.delivery = delivery;
-		this.language = language;
+		this.lang = lang;
 	}
 	
-	public Joke(String category, String type, int id, boolean safe, String setup,
-			String delivery, String language) {
+	public Joke(String category, String type, String texto1, String lang) {
 		super();
+		
 		this.category = category;
 		this.type = type;
-		this.id = id;
-		this.safe = safe;
-		this.setup = setup;
-		this.delivery = delivery;
-		this.language = language;
-	}
-	
-	public Joke(String category, String type, String joke,int id, boolean safe, String language) {
-		super();
-		this.category = category;
-		this.type = type;
-		this.joke = joke;
-		this.id = id;
-		this.safe = safe;
-		this.language = language;
+		this.joke = texto1;
+		this.lang = lang;
 	}
 
 
 	public String getCategory() {
+		
 		return category;
 	}
 
@@ -85,17 +63,6 @@ public class Joke{
 		this.type = type;
 	}
 
-
-	public String getJoke() {
-		return joke;
-	}
-
-
-	public void setJoke(String joke) {
-		this.joke = joke;
-	}
-
-
 	public Flags getFlags() {
 		return flags;
 	}
@@ -105,49 +72,70 @@ public class Joke{
 		this.flags = flags;
 	}
 
+	
+    public String getLang() {
+   	
+   	
+		return lang;
+	}
 
-	public int getId() {
-		return id;
+	public void setLang(String lang) {
+		
+
+		this.lang = lang;
 	}
 
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
-
-	public boolean isSafe() {
-		return safe;
-	}
-
-
-	public void setSafe(boolean safe) {
-		this.safe = safe;
-	}
-
-
-	public String getSetup() {
+	public String getTexto1() {
+		if(type.equals("single")) {
+			return joke;
+		}
 		return setup;
 	}
 
 
-	public void setSetup(String setup) {
-		this.setup = setup;
+	public void setTexto1(String texto1) {
+		this.setup = texto1;
 	}
+	
 
 
-	public String getDelivery() {
+
+
+	public String getTexto2() {
 		return delivery;
 	}
 
 
-	public void setDelivery(String delivery) {
-		this.delivery = delivery;
+	public void setTexto2(String texto2) {
+		this.delivery = texto2;
 	}
+
+
+
+
+	@Override
+	public String toString() {
+		
+		if(type.equals("single")) {
+			
+			return "Joke [category=" + category + ", type=" + type + ", texto1=" + joke + ", "
+					+ "flags=" + flags + ", lang=" + lang + "]";
+			
+		}
+		
+		return "Joke [category=" + category + ", type=" + type + ", texto1=" + setup + ", texto2=" + delivery
+				+ ", flags=" + flags + ", lang=" + lang + "]";
+	}
+
+
+
+
 	
 	
+
 	
-    
+	
     
     
 }

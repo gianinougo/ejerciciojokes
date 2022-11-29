@@ -1,3 +1,4 @@
+//Autor Ugo Gianio De Simón
 package com.ugo.ejerciciojokes.Main;
 
 import java.sql.SQLException;

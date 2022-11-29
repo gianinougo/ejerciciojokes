@@ -1,3 +1,4 @@
+//Autor Ugo Gianio De Simón
 package com.ugo.ejerciciojokes.Data;
 
 public class Flags {
@@ -93,6 +94,17 @@ public class Flags {
 		public void setExplicit(boolean explicit) {
 			this.explicit = explicit;
 		}
+
+
+
+		@Override
+		public String toString() {
+			return "Flags [nsfw=" + nsfw + " religious=" + religious + " political=" + political + " racist="
+					+ racist + " sexist=" + sexist + " explicit=" + explicit + "]";
+		}
+		
+		
+		
 		
 		
 		
