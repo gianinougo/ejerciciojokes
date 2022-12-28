@@ -216,5 +216,20 @@ public class JdbcUtils {
 	private static int countMatches(String sql, char caracterBuscado) {
 		return (int)sql.chars().filter(e->e==caracterBuscado).count();
 	}
+
+	public static ResultSet ejecutarCallableTable(String nombreProcedimiento, String texto) {
+		try {
+			CallableStatement cStmt = con.prepareCall("{call " + nombreProcedimiento +"}");
+			if (!texto.isEmpty())
+				cStmt.setString(1, texto); // le paso el parametro texto
+			ResultSet rs = cStmt.executeQuery();  // Obtengo el resultado
+			return rs;
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 	
 }

@@ -22,6 +22,10 @@ import org.apache.commons.dbutils.DbUtils;
 public class MenuAplication {
 	
 	List<Joke> jokes = new ArrayList<>();
+	
+	String url = "jdbc:postgresql://localhost:5432/jokes2";
+	String username = "postgres";
+	String password = "0000";
 
 	public void ejecutar() throws SQLException {
 		
@@ -29,7 +33,7 @@ public class MenuAplication {
 		try {
 			
 			Class.forName("org.postgresql.Driver");
-			String url = "jdbc:postgresql://localhost:5432/jokes";
+			String url = "jdbc:postgresql://localhost:5432/jokes2";
 			String usuario = "postgres";
 			String password = "0000";
 			conn = DriverManager.getConnection(url, usuario, password);
@@ -163,7 +167,7 @@ public class MenuAplication {
 		try
 		{
 			cs = conn.prepareCall(
-			"{call CHISTES_SIN_FLAG()}");
+			"{call listar_chistes_sin_flag()}");
 			rsChistes = cs.executeQuery();
 			while(rsChistes.next())
 			{
@@ -186,46 +190,32 @@ public class MenuAplication {
 
 	private void searchJokes(Connection conn) throws SQLException {
 		
-		CallableStatement cs = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
-		ResultSet rs2 = null;
+		Scanner scanner = new Scanner(System.in);
+		System.out.println("Introduce el texto a buscar:");
+		String searchText = scanner.nextLine();
 		
-		Scanner sc = new Scanner(System.in);
-		System.out.print("Buscar: ");
-		String search = sc.nextLine();
-		search = search.toUpperCase();
-		
-		try
-		{
-			ps = conn.prepareStatement("SELECT * FROM jokes " +
-								"WHERE UPPER(texto1) = ?");
-			ps.setString(1, search);
-			rs = ps.executeQuery();
-			
-			while(rs.next())
-			{
-				cs = conn.prepareCall(
-				"{call SEARCH(?)}");
-				cs.setInt(1, rs.getInt("id_jokes"));
-				rs = cs.executeQuery();
-				while(rs.next())
-				{
-					System.out.println(rs.getString(1) + " - " + rs.getString(2) +
-							" - " + rs.getString(3));
-				}
-			}
-		} catch (SQLException e)
-		{
-			e.printStackTrace();
+		String sql = "SELECT * FROM buscar_chistes(?)";
+
+		try (Connection conn2 = DriverManager.getConnection(url, username, password);
+		     PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+		    stmt.setString(1, searchText);
+		    ResultSet rs = stmt.executeQuery();
+		    while (rs.next()) {
+		        int idLanguages = rs.getInt("id_languages");
+		        int idJokes = rs.getInt("id_jokes");
+		        String texto1 = rs.getString("texto1");
+		        String texto2 = rs.getString("texto2");
+		        System.out.println("COD idioma: " + idLanguages + " - ID - " + idJokes + " - Texto - " + texto1 + " -Texto2- " + texto2);
+		    }
+		} catch (SQLException e) {
+		    e.printStackTrace();
 		}
-		finally
-		{
-			DbUtils.closeQuietly(rs);
-			DbUtils.closeQuietly(rs2);
-			DbUtils.closeQuietly(ps);
-			DbUtils.closeQuietly(cs);
-		}
+
+
+
+
+
 		
 	}
 
@@ -581,24 +571,31 @@ public class MenuAplication {
 				+ "\r\n"
 				+ "\r\n"
 				+ "\r\n"
-				+ "CREATE OR REPLACE FUNCTION CHISTES_SIN_FLAG()\r\n"
-				+ "RETURNS SETOF jokes\r\n"
-				+ "AS\r\n"
-				+ "	'SELECT id_jokes, id_languages, texto1, texto2, id_category, id_type\r\n"
-				+ "	FROM public.jokes;'\r\n"
-				+ "LANGUAGE sql;"
-				+ "--DROP FUNCTION get_search_chiste(character varying);\r\n"
-				+ "\r\n"
-				+ "CREATE OR REPLACE FUNCTION SEARCH(BUSCAR varchar)\r\n"
-				+ "RETURNS VARCHAR\r\n"
-				+ "AS\r\n"
+				+ "create or replace function buscar_chistes(texto varchar)\r\n"
+				+ "returns setof jokes as\r\n"
 				+ "$$\r\n"
-				+ "BEGIN\r\n"
-				+ "	select * from jokes\r\n"
-				+ "    WHERE texto1 = BUSCAR; \r\n"
-				+ "END\r\n"
+				+ "begin\r\n"
+				+ "	return query select * from jokes where \r\n"
+				+ "		texto1 ilike '%'||texto||'%' or\r\n"
+				+ "		texto2 ilike '%'||texto||'%';\r\n"
+				+ "end;\r\n"
 				+ "$$\r\n"
-				+ "LANGUAGE PLPGSQL;";
+				+ "language 'plpgsql';"
+				+ "create or replace function listar_chistes_sin_flags() \r\n"
+				+ "returns setof jokes as\r\n"
+				+ "$$\r\n"
+				+ "begin\r\n"
+				+ "	return query select * from jokes j where j.id_idioma not in (\r\n"
+				+ "		select f.idioma from flags f where j.id_idioma=f.idioma\r\n"
+				+ "		and j.id_chiste=f.chiste)\r\n"
+				+ "		and\r\n"
+				+ "		id_chiste not in(\r\n"
+				+ "		select f.chiste from flags f where j.id_idioma=f.idioma\r\n"
+				+ "		and j.id_chiste=f.chiste)\r\n"
+				+ "		order by id_idioma, id_chiste;\r\n"
+				+ "end;\r\n"
+				+ "$$\r\n"
+				+ "language 'plpgsql';";
 		
 		try {
 			statement = conn.createStatement();
